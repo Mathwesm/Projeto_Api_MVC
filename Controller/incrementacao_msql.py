@@ -13,10 +13,10 @@ load_dotenv()
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# 1. Configuração de Caminhos
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-# 2. Obtenção de Dados da API
+
 def obter_dados_api():
     try:
         url = "https://myfin-financial-management.bubbleapps.io/api/1.1/obj/transactions"
@@ -39,7 +39,6 @@ def obter_dados_api():
         logger.error(f"Erro ao obter dados da API: {erro}")
         raise
 
-# 3. Configuração do Banco de Dados
 def configurar_conexao_banco():
     try:
         configuracoes_banco = {
@@ -56,7 +55,7 @@ def configurar_conexao_banco():
             pool_recycle=3600
         )
 
-        # Testar conexão
+       
         with engine.connect() as conexao:
             logger.info(f"Conexão bem-sucedida com o banco: {configuracoes_banco['banco']}")
 
@@ -66,7 +65,7 @@ def configurar_conexao_banco():
         logger.error(f"Erro na conexão com o banco: {erro}")
         raise
 
-# 4. Verificação da Estrutura da Tabela
+
 def verificar_estrutura_tabela(engine):
     metadata = MetaData()
 
@@ -108,10 +107,10 @@ def verificar_estrutura_tabela(engine):
 
     return tabela_transacoes
 
-# 5. Inserção de Dados
+
 def inserir_dados(engine, df, nome_tabela='transactions'):
     try:
-        # Filtra colunas existentes na tabela
+       
         inspetor = inspect(engine)
         colunas_tabela = {col['name'] for col in inspetor.get_columns(nome_tabela)}
         colunas_df = set(df.columns)
@@ -122,7 +121,7 @@ def inserir_dados(engine, df, nome_tabela='transactions'):
 
         df_filtrado = df[colunas_validas]
 
-        # Tentativa de inserção em lote
+        
         logger.info("Iniciando inserção em lote...")
         tempo_inicio = datetime.now()
 
@@ -176,19 +175,18 @@ def inserir_dados(engine, df, nome_tabela='transactions'):
         if estatisticas['erros'] > 0:
             logger.warning(f"Exemplos de erros: {estatisticas['exemplos_erros'][:3]}")
 
-# Função Principal
+
 def main():
     try:
-        # 1. Obter dados
+        
         df = obter_dados_api()
 
-        # 2. Configurar banco
         engine = configurar_conexao_banco()
 
-        # 3. Verificar tabela
+        
         verificar_estrutura_tabela(engine)
 
-        # 4. Inserir dados
+       
         inserir_dados(engine, df)
 
         logger.info("Processo concluído com sucesso!")
@@ -198,4 +196,4 @@ def main():
         sys.exit(1)
 
 if __name__ == "__main__":
-    main()
+    main();
